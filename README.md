@@ -1,10 +1,7 @@
 # ccompila
-Universidad Mariano Gálvez de Guatemala
-Facultad de Ingeniería en Sistemas
-Curso: Compiladores
-Catedrático: Ing. Corina Pérez
+# Universidad Mariano Gálvez de Guatemala
+**Facultad de Ingeniería en Sistemas**
 
+**Compiladores**
 
-Analizador
-
-#BeHappy
+**Ing. Corina Pérez**
