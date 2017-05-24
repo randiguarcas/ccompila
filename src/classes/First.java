@@ -30,6 +30,11 @@ public class First {
     public void setValue(ArrayList<String> value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return this.key + " : " + this.value.toString().replace("[", "{ ").replace("]", " }");
+    }
     
    
 }

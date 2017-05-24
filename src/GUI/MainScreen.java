@@ -5,14 +5,18 @@
  */
 package GUI;
 
+import classes.First;
+import classes.Last;
 import classes.ReaderFile;
 import classes.Robot;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.JFileChooser;
 import static javax.swing.JFileChooser.CANCEL_SELECTION;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -41,6 +45,18 @@ public class MainScreen extends javax.swing.JFrame {
 
         JOpenFile = new javax.swing.JButton();
         JFile = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        JTableContent = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        JTableAlphabet = new javax.swing.JTable();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        JTableEnviroments = new javax.swing.JTable();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        JTableTerms = new javax.swing.JTable();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        JTableFirst = new javax.swing.JTable();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        JTableLast = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -51,25 +67,121 @@ public class MainScreen extends javax.swing.JFrame {
             }
         });
 
+        JTableContent.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        JTableContent.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "File Content"
+            }
+        ));
+        JTableContent.setEditingRow(0);
+        JTableContent.setRowHeight(30);
+        jScrollPane1.setViewportView(JTableContent);
+
+        JTableAlphabet.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        JTableAlphabet.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Alphabet"
+            }
+        ));
+        JTableAlphabet.setRowHeight(30);
+        jScrollPane2.setViewportView(JTableAlphabet);
+
+        JTableEnviroments.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        JTableEnviroments.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Enviroments"
+            }
+        ));
+        JTableEnviroments.setRowHeight(30);
+        jScrollPane3.setViewportView(JTableEnviroments);
+
+        JTableTerms.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        JTableTerms.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Terminals"
+            }
+        ));
+        JTableTerms.setRowHeight(30);
+        jScrollPane4.setViewportView(JTableTerms);
+
+        JTableFirst.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        JTableFirst.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "First Function"
+            }
+        ));
+        JTableFirst.setRowHeight(30);
+        jScrollPane5.setViewportView(JTableFirst);
+
+        JTableLast.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        JTableLast.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Last Function"
+            }
+        ));
+        JTableLast.setRowHeight(35);
+        jScrollPane6.setViewportView(JTableLast);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addComponent(JOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(JFile)
-                .addContainerGap(885, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(JOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(JFile))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(36, 36, 36))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(22, 22, 22)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(JOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(JFile))
-                .addContainerGap(424, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                .addGap(213, 213, 213))
         );
 
         pack();
@@ -99,21 +211,22 @@ public class MainScreen extends javax.swing.JFrame {
         
         //Carga de archivo al robot
         robot.load(readerFile.content);
-        // metodo para ver el contenido original del fichero
-        robot.getOriginalContent();
-        // metodo para cargar el contenido del alfabeto
-        robot.getAlphabet();
+        // metodo para ver el contenido original del fichero robot.getOriginalContent();
+        JTableContentRender(robot.getOriginalContent());
+        // metodo para cargar el contenido del alfabeto robot.getAlphabet()
+        JTableAlphabetRender(robot.getAlphabet());
         // metogo para cargar el contenido limpio
         robot.getCleanContent();
-        //metodo para cargar las variables 
-        robot.getEnviroment();
-        //metodo que cargar todas las terminales
-        robot.getTerms();
-        //metodo para cargar la function primera
-        robot.getFirstLogic();
-        //System.out.println(robot.getBigStruct());
+        //metodo para cargar las variables  robot.getEnviroment()
+        JTableEnviromentsRender(robot.getEnviroment());
+        //metodo que cargar todas las terminales robot.getTerms()
+        JTableTermsRender(robot.getTerms());
+        //metodo para cargar la function primera robot.getFirstLogic()
+        JTableFirstRender(robot.getFirstLogic());
+        //metodo que retorna la funcion siguiente robot.getLastLogic()
+        JTableLastRender(robot.getLastLogic());
     }//GEN-LAST:event_JOpenFileActionPerformed
-
+    
     /**
      * @param args the command line arguments
      */
@@ -152,5 +265,86 @@ public class MainScreen extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel JFile;
     private javax.swing.JButton JOpenFile;
+    private javax.swing.JTable JTableAlphabet;
+    private javax.swing.JTable JTableContent;
+    private javax.swing.JTable JTableEnviroments;
+    private javax.swing.JTable JTableFirst;
+    private javax.swing.JTable JTableLast;
+    private javax.swing.JTable JTableTerms;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     // End of variables declaration//GEN-END:variables
+
+    private void JTableContentRender(ArrayList<String> originalContent) {
+        DefaultTableModel FileTableModel = new DefaultTableModel();
+        FileTableModel.setColumnIdentifiers(new String[]{"File Content"});
+        Object[] FileRow = new Object[FileTableModel.getColumnCount()];
+        for (int i = 0; i < originalContent.size(); i++) {
+            FileRow[0] = originalContent.get(i);
+            FileTableModel.addRow(FileRow);
+        }
+        JTableContent.setModel(FileTableModel);
+    }
+    
+     private void JTableAlphabetRender(String[] originalContent) {
+        DefaultTableModel FileTableModel = new DefaultTableModel();
+        FileTableModel.setColumnIdentifiers(new String[]{"Alphabet"});
+        Object[] FileRow = new Object[FileTableModel.getColumnCount()];
+        for (int i = 0; i < originalContent.length; i++) {
+            FileRow[0] = originalContent[i];
+            FileTableModel.addRow(FileRow);
+        }
+        JTableAlphabet.setModel(FileTableModel);
+    }
+     
+    private void JTableEnviromentsRender(ArrayList<String> originalContent) {
+        DefaultTableModel FileTableModel = new DefaultTableModel();
+        FileTableModel.setColumnIdentifiers(new String[]{"Enviroments"});
+        Object[] FileRow = new Object[FileTableModel.getColumnCount()];
+        for (int i = 0; i < originalContent.size(); i++) {
+            FileRow[0] = originalContent.get(i);
+            FileTableModel.addRow(FileRow);
+        }
+        JTableEnviroments.setModel(FileTableModel);
+    }
+    private void JTableTermsRender(ArrayList<String> originalContent) {
+        DefaultTableModel FileTableModel = new DefaultTableModel();
+        FileTableModel.setColumnIdentifiers(new String[]{"Terminals"});
+        Object[] FileRow = new Object[FileTableModel.getColumnCount()];
+        for (int i = 0; i < originalContent.size(); i++) {
+            FileRow[0] = originalContent.get(i);
+            FileTableModel.addRow(FileRow);
+        }
+        JTableTerms.setModel(FileTableModel);
+    } 
+    
+    private void JTableFirstRender(ArrayList<First> first) {
+        DefaultTableModel FileTableModel = new DefaultTableModel();
+        FileTableModel.setColumnIdentifiers(new String[]{"First Function"});
+        Object[] FileRow = new Object[FileTableModel.getColumnCount()];
+        
+        for (First getFirst : first) {
+            FileRow[0] = getFirst.toString();
+            FileTableModel.addRow(FileRow);
+        }
+        
+        JTableFirst.setModel(FileTableModel);
+    } 
+    
+    private void JTableLastRender(ArrayList<Last> first) {
+        DefaultTableModel FileTableModel = new DefaultTableModel();
+        FileTableModel.setColumnIdentifiers(new String[]{"Last Function"});
+        Object[] FileRow = new Object[FileTableModel.getColumnCount()];
+        
+        for (Last getFirst : first) {
+            FileRow[0] = getFirst.toString();
+            FileTableModel.addRow(FileRow);
+        }
+        
+        JTableLast.setModel(FileTableModel);
+    } 
 }
