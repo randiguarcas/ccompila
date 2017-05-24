@@ -272,7 +272,7 @@ public class Robot {
             this.termStack(string);
         }
         //System.out.println(temp);
-        return this.terms;
+        return cleanStack(this.terms);
     }
     
     
@@ -302,65 +302,252 @@ public class Robot {
        }
     }
 
-    public void getFirstLogic() {
-        ArrayList<First> tempFirst = new ArrayList<First>();
-        ArrayList<Struct> bigStruct = (ArrayList<Struct>) this.getBigStruct().clone();
-        
-        for (Struct struct : bigStruct) {
-            ArrayList<ArrayList<String>> productionList = struct.getValue();
-            //System.out.println(struct.getKey() + "=>" + struct.getValue());
-            //nuevo First
+    public ArrayList<First> first = new ArrayList<>();
+    public ArrayList<Last> last = new ArrayList<>();
+    public ArrayList<String> globalTemp = new ArrayList<>();
+    
+    public ArrayList<First> getFirstLogic() {
+        //recorre cada una de las variables con sus producciones
+        for (Struct struct : this.getBigStruct()) {
+            //limpiar el globalTemporal que apila las terminales
+            globalTemp.clear();
+            
+            //t es un array con cada una de las terminales de la variable
+            ArrayList<String> t = new ArrayList<>();
+            //por cada produccion de la variable 
+            for (ArrayList<String> producction : struct.getValue()) {
+                //función recursiva que retorna un globalTemp de terminales apiladas
+                t = (ArrayList<String>) this.recursiveFirstLogic(struct.getKey(), producction).clone();
+            }
+            
+            // crea un nuevo objeto de first según la variable que se está analizando y el resultador de terminales 
             First first = new First();
-            //cada produccion es un arrayList [+, T, S1], [-, T, S1], [e]
-            ArrayList<String> tempOut = new ArrayList<>(); //arraylist con las terminales de firstLogic
-            for (ArrayList<String> prList : productionList) {
-                //solo la primera posicion de cada produccion
-                String firstPosition = prList.get(0); 
-                //verificamos si es una terminal
-                ArrayList<String> terms = (ArrayList<String>) this.getTerms().clone();
-                
-                //ArrayList<String> tempOut = new ArrayList<>();
-                
-                for (String term : terms) {
-                    
-                    if(term.equals(firstPosition)){
-                        //System.out.println(firstPosition + " == " + term);
-                        first.setKey(struct.getKey()); //agregar la variable a first
-                        tempOut.add(term);
-                        break;
-                    }else{
-                        //si la primera posición no es un terminal
-                        //verificamos que la posición que viene sea 
-                        System.out.println(firstPosition);
-                        //break;
-                        //System.out.println(firstPosition + " <> " + term);
+            first.setKey(struct.getKey());
+            first.setValue(t);
+            this.first.add(first);
+        }
+        
+        /*for (First gfirst : this.first) {
+            System.out.println(gfirst.toString());
+        }*/
+        return this.first;
+    }
+    
+    private ArrayList<String> recursiveFirstLogic(String key, ArrayList<String> production) {
+        //primera posicion de cada produccion  
+        String firstPosition = production.get(0);
+        //buscamos si la primera posición se encuentra en el arraylist de terminales
+        if(!this.getTerms().contains(firstPosition)){
+            //Si el array de terminales no contiene la el dato de firstPosition
+            //Buscar en la structura la variable  A = firstPosition
+            for (Struct struct : this.getBigStruct()) {
+                if(struct.getKey().equals(firstPosition)){
+                    //encontrada la variable segun firstPosition en la estructura de variables con terminales
+                    for (ArrayList<String> producction : struct.getValue()) {
+                        //por cada produccion de la variable inicia la recursividad hasta encontrar las terminales
+                        this.recursiveFirstLogic(struct.getKey(), producction);
                     }
                 }
-                
             }
-            first.setValue(tempOut);
-            tempFirst.add(first);
-            
+        }else{
+            //si el valor de firstPosition se encuentra en el array de terminales
+            //apila cada un de los valor a globalTemp
+            globalTemp.add(firstPosition);
+        }
+        //retorna globalTemp
+        return globalTemp;
+    }
+
+    public ArrayList<Last> getLastLogic() {
+        //por cada elemento en struct
+        for (int i = 0; i < this.getBigStruct().size(); i++) {
+            Struct struct = this.getBigStruct().get(i);
+            //primer evento
+            if(i==0){
+                //tomamos la primer variable "S"
+                String firstEnv = struct.getKey().toString();
+                //buscamos en la estructura en que produccion está la primera variable
+                for (Struct lastStruct : this.getBigStruct()) {
+                    //buscamos en cada una de las producciones cual contiene la variable
+                    int prx = 0;
+                    for (ArrayList<String> production : lastStruct.getValue()) {
+                        if(production.contains(firstEnv)){
+                            //verificamos si el valor siguiente tiene valor
+                            boolean whoIs = this.emptyOrTerm(production, prx);
+                            if(whoIs){
+                                //si retorna 1 hay un valor siguiente para ser verigficado si es o no una terminal
+                                String last = production.get(prx + 1);
+                                //buscamos si last es una terminal
+                                if(this.getTerms().contains(last)){
+                                    //agregamos el terminal y le concatenamos $ a un nuevo objeto Last
+                                    ArrayList<String> tempTerm = new ArrayList<>();
+                                    tempTerm.add(last);
+                                    tempTerm.add("$");
+                                    Last tlast = new Last();
+                                    tlast.setValue(tempTerm);
+                                    tlast.setKey(firstEnv);
+                                    
+                                    this.last.add(tlast);
+                                }else{
+                                    System.out.println(last + " no es una terminal");
+                                }
+                            }else{
+                                //si no hay un  valor siguiente se saca siguiente
+                                System.out.println("No hay un valor para el primer evento de siguiente");
+                            }
+                        }
+                        prx++;
+                    }
+                }
+            }else{
+                if(i > 0){
+                   //tomamos el resto de variableS
+                    String firstEnv = struct.getKey().toString();
+                    //System.out.println("Analizando : " + firstEnv);
+                    //buscamos en que producciones se encuentran estas variables
+                    for (Struct lStruct : this.getBigStruct()) {
+                        //buscamos en cada producción cual tiene 
+                        String keyOut = lStruct.getKey(); //almacena que variable está sacando la produccion
+                        for (ArrayList<String> inProduccion : lStruct.getValue()) {
+                            //por cada produccion buscamos si contiene la varible y en que posición
+                            for (int j = 0; j < inProduccion.size(); j++) {
+                                String prod = inProduccion.get(j);
+                                //si la produccion contiene la variable que se está buscando
+                                if(prod.equals(firstEnv)){
+                                    //System.out.println(firstEnv+ " en " + keyOut + " : " + inProduccion  + " en index " +j); 
+                                    //si la variable que esta sacando el valor es distinta a la que estamos analizando S1 != S
+                                    if(!keyOut.equals(firstEnv)){
+                                        //buscamos si puede tiene siguiente
+                                        boolean inFlag = this.emptyOrTerm(inProduccion, j);
+                                        if(inFlag){
+                                            //si retorna 1 hay un valor siguiente para ser verigficado si es o no una terminal
+                                            String last = inProduccion.get(j + 1);
+                                            //System.out.println("siguiente de " + firstEnv + " : "  + last);
+                                            //verificamos si siguiente es una variable o una terminal
+                                            if(this.getTerms().contains(last)){
+                                                //System.out.println(last+" es una terminal");
+                                            }else{
+                                                //si last no es igual que la variable que lo está sacando
+                                                if(!keyOut.equals(last)){
+                                                    //buscamos primera de last
+                                                    ArrayList<String> tmpFirst = new ArrayList<>();
+                                                    ArrayList<String> tmpLast = new ArrayList<>();
+                                                    for (First tFirst : this.getFirstLogic()) {   
+                                                        if(tFirst.getKey().equals(last)){
+                                                            //System.out.println("Primera de " + last + " : " + tFirst.getValue());
+                                                            tmpFirst = (ArrayList<String>) tFirst.getValue().clone();
+                                                            break;
+                                                        }else{
+                                                            //System.out.println(last + " No encontrado en global de first");
+                                                        }  
+                                                     }
+                                                    //buscamos siguiente de last
+                                                    for (Last tLast : this.last) {
+                                                        if (tLast.getKey().equals(last)) {
+                                                            tmpLast = (ArrayList<String>) tLast.getValue().clone();
+                                                            //System.out.println("Siguiente de " + last + " : " + tLast.getValue());
+                                                            break;
+                                                        }else{
+                                                            //System.out.println(last  + " no encontrado en Last");
+                                                        }
+                                                    }
+                                                    //generamos un nuevo arraylist de primera y siguiente
+                                                    Last nLast = new Last();
+                                                    nLast.setKey(firstEnv);
+                                                    nLast.setValue(this.lastArray(tmpFirst, tmpLast));
+                                                    this.last.add(nLast);
+                                                }else{
+                                                    //System.out.println(keyOut + "=" + last);
+                                                }
+                                                //System.out.println(last+" no es una terminal");
+                                            }
+                                        }else{
+                                            //si no hay siguiente [T, S1] analizando S1
+                                            //buscamos la variable que lo está sacando y la buscamos en el global de Last
+                                            ArrayList<Last> tempVLast = (ArrayList<Last>) this.last.clone();
+                                            for (Last globalLast : tempVLast) {
+                                                //si es encontrada la variable que saco el valor dentro de la Last
+                                                if(globalLast.getKey().equals(keyOut)){
+                                                    //pasamos el valor de siguiente de last y lo agregamos al global de last
+                                                    Last pLast = new Last();
+                                                    pLast.setKey(firstEnv);
+                                                    pLast.setValue(globalLast.getValue());
+                                                    this.last.add(pLast);
+                                                    //System.out.println("Siguiente de " + keyOut + globalLast.getValue());
+                                                    //System.out.println("analizando " + firstEnv +", Siguiente de " + globalLast.getKey() + " : " + globalLast.getValue());
+                                                }else{
+                                                    //System.out.println(keyOut + " no encontrado en global de Last");
+                                                }
+                                            }
+                                            //System.out.println("ya no hay variable a la par para " + inProduccion);
+                                        }
+                                        //System.out.println(inFlag);
+                                        //System.out.println(firstEnv+ " in " + inProduccion + " out " + keyOut + " index " +j); 
+                                    }
+                                    break;
+                                }
+                            }
+                         
+                        }
+                    } 
+                }
+            }
         }
         
-        for (First first : tempFirst) {
-            System.out.println(first.getKey() +" => "+ first.getValue());
+        return this.last;
+    }
+    
+    private void recursiveLastLogic(String key, ArrayList<String> production){
+        //buscar la variable (key) en la primera producción en donde la encuentra
+        
+        for (Struct struct : this.getBigStruct()) {
+            
         }
+    }
+ 
+    private boolean  emptyOrTerm(ArrayList<String> production, int i) {
+        boolean flag = false;
+        int fullSize = (production.size());
+        int last = (i + 1);
+        
+        if(fullSize > last){
+            flag = true;
+            //System.out.println("aun hay elemento");
+        }else{
+            flag = false;
+            //System.out.println("ya no hay elemento");
+        }
+        return flag;
+    }
+    
+    
+    //retorna un array de first y last
+    private ArrayList<String>lastArray(ArrayList<String> tmpFirst, ArrayList<String> tmpLast) {
+        //removemos 'e'
+        ArrayList<String> tFirst = new ArrayList<>();
+        
+        for (String first : tmpFirst) {
+            if(!first.equals("e")){
+                tFirst.add(first);
+            }
+        }
+        
+        for (String last : tmpLast) {
+            tFirst.add(last);
+        }
+        return tFirst;
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    public void recursiveFirstLogic(String key){
-        
-        ArrayList<Struct> bigStruct = (ArrayList<Struct>) this.getBigStruct().clone();
-        for (Struct struct : bigStruct) {
-            if(struct.getKey() != key){
-                recursiveFirstLogic(struct.getKey());
-            }else{
-                System.out.println(struct.getValue() + "=>" + struct.getValue());
-                break;
-            }
-            //System.out.println(struct.getValue());
+    //elimina repeditos
+    private ArrayList<String> cleanStack(ArrayList<String> content){
+        ArrayList<String> stack = new ArrayList<String>();
+        for (int i = 0; i < content.size(); i++) {
+            String value = content.get(i);
+            if(!stack.contains(value) ){
+                    stack.add(value);
+            }            
         }
-
+        return stack;
     }
 }

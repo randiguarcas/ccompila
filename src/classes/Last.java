@@ -11,9 +11,9 @@ import java.util.ArrayList;
  *
  * @author Randi Guarcas
  */
-public class Struct {
+public class Last {
     public String key;
-    public ArrayList< ArrayList<String> > value;
+    public ArrayList<String> value;
 
     public String getKey() {
         return key;
@@ -23,20 +23,18 @@ public class Struct {
         this.key = key;
     }
 
-    public ArrayList<ArrayList<String>> getValue() {
+    public ArrayList<String> getValue() {
         return value;
     }
 
-    public void setValue(ArrayList<ArrayList<String>> value) {
+    public void setValue(ArrayList<String> value) {
         this.value = value;
     }
 
     @Override
     public String toString() {
-        return this.key + " => " +  this.value.toString();
+        return this.key + " : " + this.value.toString().replace("[", "{ ").replace("]", " }");
     }
-    
-    
     
     
 }
