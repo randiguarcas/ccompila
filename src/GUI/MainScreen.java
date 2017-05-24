@@ -100,11 +100,18 @@ public class MainScreen extends javax.swing.JFrame {
         //Carga de archivo al robot
         robot.load(readerFile.content);
         // metodo para ver el contenido original del fichero
-        System.out.println(robot.getOriginalContent());
-        // metodo para ver el contenido del alfabeto
-        System.out.println(Arrays.toString(robot.getAlphabet()));
-        // metogo para ver el contenido limpio
-        System.out.println(robot.getCleanContent());
+        robot.getOriginalContent();
+        // metodo para cargar el contenido del alfabeto
+        robot.getAlphabet();
+        // metogo para cargar el contenido limpio
+        robot.getCleanContent();
+        //metodo para cargar las variables 
+        robot.getEnviroment();
+        //metodo que cargar todas las terminales
+        robot.getTerms();
+        //metodo para cargar la function primera
+        robot.getFirstLogic();
+        //System.out.println(robot.getBigStruct());
     }//GEN-LAST:event_JOpenFileActionPerformed
 
     /**
