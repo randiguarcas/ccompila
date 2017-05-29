@@ -6,6 +6,7 @@
 package classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -552,7 +553,7 @@ public class Robot {
     }
     
     //retorna terminales según función primera
-    public void getSymbolTable(){
+    public ArrayList<Symbol> getSymbolTable(){
         ArrayList<Symbol> tableSymbol = new ArrayList<>();
         ArrayList<String> enviroments = (ArrayList<String>) this.getEnviroment().clone();
         ArrayList<String> terms = this.getTerms();
@@ -567,14 +568,18 @@ public class Robot {
             ArrayList<SubSymbol> inKey = new ArrayList<>();
             for (String term : terms) {
                 if(!term.equals("e")){
+                    ArrayList< ArrayList<String>  > vhos = new ArrayList<>();
                     SubSymbol hSubSymbol = new SubSymbol();
                     hSubSymbol.setKey(term);
+                    hSubSymbol.setValue(vhos);
                     inKey.add(hSubSymbol);
                     
                     
                     if(pr == (terms.size()-1)){
+                        ArrayList< ArrayList<String>  > vho = new ArrayList<>();
                         SubSymbol nSubSymbol = new SubSymbol();
                         nSubSymbol.setKey("$");
+                        nSubSymbol.setValue(vho);
                         inKey.add(nSubSymbol);
                     }
                     pr++;
@@ -591,11 +596,32 @@ public class Robot {
         //por cada terminal en Primero(A)
         for (First firstStruct : this.getFirstLogic()) {
             if(i <= max){
+                int iprod = 0;
                String firstEnv = firstStruct.getKey(); //contiene la variable de primera
                //por cada terminal de primera
                for (String fterm : firstStruct.getValue()) {
-                   if(fterm.equals("e")){ //si e esta en primero de 
-                       
+                   if(fterm.equals("e")){ //si e esta en primero de A
+                      //retorna un array list con las terminales de siguiente y $ si tuviese
+                      ArrayList<String> termLast =  this.getProductionFromBigLast(firstEnv, fterm, iprod);
+                      //retorna la producción que se va a insertar segun un indice especifico
+                      ArrayList<String> termProd = this.getProdScene(firstEnv, fterm, iprod); 
+                      
+                      //agregar los valores devuelos a la tabla de simbolos
+                       for (Symbol symbol : tableSymbol) {
+                           if(symbol.getKey().equals(firstEnv)){ //buscamos la variable en la tabla de simbolos
+                               //System.out.println(symbol);
+                               for (SubSymbol subSymbol : symbol.getValue()) { //obtenemos la subclase
+                                   for (String lt : termLast) {// por cada terminal de last
+                                       if(subSymbol.getKey().equals(lt)){ //buscamos que sean las de las terminales de siguiente
+                                            subSymbol.getValue().add(termProd); //agregamos la producción
+                                           break;
+                                       }
+                                   }
+                               }
+                               break;
+                           }
+                       }
+                      
                    }else{
                        ArrayList<String> temp;
                        temp = (ArrayList<String>) this.getProductionFromBig(firstEnv, fterm).clone();
@@ -604,15 +630,16 @@ public class Robot {
                        //agregar los valores devuelos a la tabla de simbolos
                        for (Symbol symbol : tableSymbol) {
                            if(symbol.getKey().equals(firstEnv)){ //buscamos la variable en la tabla de simbolos
-                               ArrayList<SubSymbol> tSubSymbol = (ArrayList<SubSymbol>) symbol.getValue().clone();
-                               for (SubSymbol subSymbol : tSubSymbol) {
-                                   if(subSymbol.getKey().equals(fterm)){
-                                       subSymbol.getValue().add(temp);
+                               for (SubSymbol subSymbol : symbol.getValue()) { 
+                                   if(subSymbol.getKey().equals(fterm)){ //buscamos en que subclase está la terminal
+                                        subSymbol.getValue().add(temp);
                                    }
                                }
+                               break;
                            }
                        }
                    }
+                   iprod++;
                }
             }
             i++;
@@ -621,10 +648,42 @@ public class Robot {
         System.out.println("-------------------------------------------------------");
         
         for (Symbol symbol : tableSymbol) {
-            System.out.println(symbol.toString());
+            //System.out.println(symbol.toString());
         }
-
+        
+        return tableSymbol;
     }
+    
+    public ArrayList<Object[]> drawSymbolTable(){
+        ArrayList<Object[]> t = new ArrayList<>();
+        ArrayList<Symbol> temp = this.getSymbolTable();
+        
+        for (Symbol symbol : temp) {
+            Object[] row = new Object[symbol.getValue().size()+1];
+            row[0] = symbol.getKey().toString();
+            t.add(row);
+            int i = 1;
+            
+            for (SubSymbol subSymbol : symbol.getValue()) {
+                String r = "";
+                for (ArrayList<String> itemSub : subSymbol.getValue()) {
+                    r += itemSub.toString().replace(",", "");
+                }
+                row[i] = r;//subSymbol.getValue().toString();
+                i++;
+            }
+            
+            
+            //System.out.println(symbol.toString());
+        }
+        
+        for (Object[] objects : t) {
+            //System.out.println(Arrays.toString(objects));
+        }
+        
+        return t;
+    }
+    
     
     public ArrayList<String> getProductionFromBig(String env, String term){
         ArrayList<String>temp = new ArrayList<>();
@@ -638,6 +697,7 @@ public class Robot {
                         //System.out.println(production + " contiene " + term);
                         break;
                     }else{
+                        //System.out.println(production + " contiene " + term);
                         temp = (ArrayList<String>) production.clone();
                         //System.out.println(production + " no contiene " + term);
                     }
@@ -646,6 +706,47 @@ public class Robot {
             }
         }
         
+        return temp;
+    }
+
+    private ArrayList<String> getProductionFromBigLast(String firstEnv, String fterm, int iprod) {
+        int max = this.cleanContent.size() - 1;
+        int i = 0;
+        ArrayList<String> temp = new ArrayList<>();
+        
+        for (Last lStruct : this.last) {
+            if(lStruct.getKey().equals(firstEnv)){
+                //buscamos si siguiente contiene $
+                for (String string : lStruct.getValue()) {
+                    if(!string.equals("$")){
+                        temp.add(string);
+                    }
+                }
+            }
+        }
+        
+        //tercer regla
+        for (Last lStruct : this.last) {
+            if(lStruct.getKey().equals(firstEnv)){
+                //buscamos si siguiente contiene $
+                if(lStruct.getValue().contains("$")){
+                    temp.add("$");
+                }
+            }
+        }
+        
+        
+        return temp;
+    }
+    
+    //retorna una producción en un indice especifico
+    private ArrayList<String> getProdScene(String firstEnv, String fterm, int iprod) {
+        ArrayList<String> temp = new ArrayList<>();
+        for (Struct struct : this.getBigStruct()) {
+            if(struct.getKey().equals(firstEnv)){
+                temp = (ArrayList<String>) struct.getValue().get(iprod).clone();
+            }
+        }
         return temp;
     }
 }

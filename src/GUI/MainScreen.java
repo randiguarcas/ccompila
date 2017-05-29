@@ -9,6 +9,7 @@ import classes.First;
 import classes.Last;
 import classes.ReaderFile;
 import classes.Robot;
+import classes.Symbol;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +58,9 @@ public class MainScreen extends javax.swing.JFrame {
         JTableFirst = new javax.swing.JTable();
         jScrollPane6 = new javax.swing.JScrollPane();
         JTableLast = new javax.swing.JTable();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        JTableSymbol = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -140,6 +144,21 @@ public class MainScreen extends javax.swing.JFrame {
         JTableLast.setRowHeight(35);
         jScrollPane6.setViewportView(JTableLast);
 
+        JTableSymbol.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        JTableSymbol.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        JTableSymbol.setRowHeight(30);
+        jScrollPane7.setViewportView(JTableSymbol);
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jLabel1.setText("Symbol Table:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -164,6 +183,12 @@ public class MainScreen extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(36, 36, 36))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 655, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -172,16 +197,19 @@ public class MainScreen extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(JOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(JFile))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-                .addGap(213, 213, 213))
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(25, 25, 25)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(353, Short.MAX_VALUE))
         );
 
         pack();
@@ -226,7 +254,9 @@ public class MainScreen extends javax.swing.JFrame {
         //metodo que retorna la funcion siguiente robot.getLastLogic()
         JTableLastRender(robot.getLastLogic());
         //metodo que retorna la tabla de simbolos
-        robot.getSymbolTable();
+        //robot.getSymbolTable();
+        JTableTableSymbol(robot.drawSymbolTable(), robot.getTerms());
+        //JTableTableSymbol(robot.getSymbolTable(), robot.getTerms());
         
     }//GEN-LAST:event_JOpenFileActionPerformed
     
@@ -273,13 +303,16 @@ public class MainScreen extends javax.swing.JFrame {
     private javax.swing.JTable JTableEnviroments;
     private javax.swing.JTable JTableFirst;
     private javax.swing.JTable JTableLast;
+    private javax.swing.JTable JTableSymbol;
     private javax.swing.JTable JTableTerms;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
     // End of variables declaration//GEN-END:variables
 
     private void JTableContentRender(ArrayList<String> originalContent) {
@@ -350,4 +383,61 @@ public class MainScreen extends javax.swing.JFrame {
         
         JTableLast.setModel(FileTableModel);
     } 
+
+    /*private void JTableTableSymbol(ArrayList<Symbol> symbolTable, ArrayList<String> terms) {
+        ArrayList<String> columns = new ArrayList<>();
+        int i = 0;
+        
+        columns.add("");
+        for (String string : terms) {
+            if(!string.equals("e")){
+                columns.add(string);
+                
+            }
+        }
+        columns.add("$");
+        
+        
+        for (String column : columns) {
+            System.out.println(column);
+        }
+        DefaultTableModel FileTableModel = new DefaultTableModel();
+        FileTableModel.setColumnIdentifiers(columns.toArray());
+        Object[] FileRow = new Object[FileTableModel.getColumnCount()];
+        
+        for (Symbol symbol : symbolTable) {
+            String tenTaiKhoan = symbol.getKey();
+            String ipTaiKhoan = "";
+            
+            FileTableModel.addRow(new Object[] { tenTaiKhoan, ipTaiKhoan });
+        }
+        
+        JTableSymbol.setModel(FileTableModel);
+       
+    }*/
+
+    private void JTableTableSymbol(ArrayList<Object[]> drawSymbolTable, ArrayList<String> terms) {
+         ArrayList<String> columns = new ArrayList<>();
+        int i = 0;
+        
+        columns.add("");
+        for (String string : terms) {
+            if(!string.equals("e")){
+                columns.add(string);
+                
+            }
+        }
+        columns.add("$");
+        
+        DefaultTableModel FileTableModel = new DefaultTableModel();
+        FileTableModel.setColumnIdentifiers(columns.toArray());
+        Object[] FileRow = new Object[FileTableModel.getColumnCount()];
+        
+        
+        for (Object[] objects : drawSymbolTable) {
+            FileTableModel.addRow(objects);
+        }
+         
+        JTableSymbol.setModel(FileTableModel);
+    }
 }
