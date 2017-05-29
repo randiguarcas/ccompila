@@ -327,9 +327,7 @@ public class Robot {
             this.first.add(first);
         }
         
-        /*for (First gfirst : this.first) {
-            System.out.println(gfirst.toString());
-        }*/
+        
         return this.first;
     }
     
@@ -371,32 +369,34 @@ public class Robot {
                     //buscamos en cada una de las producciones cual contiene la variable
                     int prx = 0;
                     for (ArrayList<String> production : lastStruct.getValue()) {
-                        if(production.contains(firstEnv)){
-                            //verificamos si el valor siguiente tiene valor
-                            boolean whoIs = this.emptyOrTerm(production, prx);
-                            if(whoIs){
-                                //si retorna 1 hay un valor siguiente para ser verigficado si es o no una terminal
-                                String last = production.get(prx + 1);
-                                //buscamos si last es una terminal
-                                if(this.getTerms().contains(last)){
-                                    //agregamos el terminal y le concatenamos $ a un nuevo objeto Last
-                                    ArrayList<String> tempTerm = new ArrayList<>();
-                                    tempTerm.add(last);
-                                    tempTerm.add("$");
-                                    Last tlast = new Last();
-                                    tlast.setValue(tempTerm);
-                                    tlast.setKey(firstEnv);
-                                    
-                                    this.last.add(tlast);
+                        for (int j = 0; j < production.size(); j++) {
+                            //buscamos en que produccion está la variable que estamos buscando
+                            if(production.get(j).equals(firstEnv)){
+                                boolean whoIs = this.emptyOrTerm(production, j);
+                                if(whoIs){
+                                    //si retorna 1 hay un valor siguiente para ser verigficado si es o no una terminal
+                                    String last = production.get(j + 1);
+                                    //buscamos si last es una terminal
+                                    if(this.getTerms().contains(last)){
+                                        //agregamos el terminal y le concatenamos $ a un nuevo objeto Last
+                                        ArrayList<String> tempTerm = new ArrayList<>();
+                                        tempTerm.add(last);
+                                        tempTerm.add("$");
+                                        Last tlast = new Last();
+                                        tlast.setValue(tempTerm);
+                                        tlast.setKey(firstEnv);
+
+                                        this.last.add(tlast);
+                                    }else{
+                                        System.out.println(last + " no es una terminal");
+                                    }
                                 }else{
-                                    System.out.println(last + " no es una terminal");
+                                    //si no hay un  valor siguiente se saca siguiente
+                                    System.out.println("No hay un valor para el primer evento de siguiente");
                                 }
-                            }else{
-                                //si no hay un  valor siguiente se saca siguiente
-                                System.out.println("No hay un valor para el primer evento de siguiente");
                             }
+
                         }
-                        prx++;
                     }
                 }
             }else{
@@ -549,5 +549,103 @@ public class Robot {
             }            
         }
         return stack;
+    }
+    
+    //retorna terminales según función primera
+    public void getSymbolTable(){
+        ArrayList<Symbol> tableSymbol = new ArrayList<>();
+        ArrayList<String> enviroments = (ArrayList<String>) this.getEnviroment().clone();
+        ArrayList<String> terms = this.getTerms();
+        
+        for (String enviroment : enviroments) {
+            Symbol pSymbol = new Symbol();
+            pSymbol.setKey(enviroment);
+            
+            
+            
+            int pr = 1;
+            ArrayList<SubSymbol> inKey = new ArrayList<>();
+            for (String term : terms) {
+                if(!term.equals("e")){
+                    SubSymbol hSubSymbol = new SubSymbol();
+                    hSubSymbol.setKey(term);
+                    inKey.add(hSubSymbol);
+                    
+                    
+                    if(pr == (terms.size()-1)){
+                        SubSymbol nSubSymbol = new SubSymbol();
+                        nSubSymbol.setKey("$");
+                        inKey.add(nSubSymbol);
+                    }
+                    pr++;
+                }
+            }
+            pSymbol.setValue(inKey);
+            tableSymbol.add(pSymbol);
+        }
+        
+        //bugfix
+        int max = (this.cleanContent.size()-1);
+        int i = 0;
+        
+        //por cada terminal en Primero(A)
+        for (First firstStruct : this.getFirstLogic()) {
+            if(i <= max){
+               String firstEnv = firstStruct.getKey(); //contiene la variable de primera
+               //por cada terminal de primera
+               for (String fterm : firstStruct.getValue()) {
+                   if(fterm.equals("e")){ //si e esta en primero de 
+                       
+                   }else{
+                       ArrayList<String> temp;
+                       temp = (ArrayList<String>) this.getProductionFromBig(firstEnv, fterm).clone();
+                       //System.out.println(firstEnv + " con " + fterm + " = " + temp);
+                       
+                       //agregar los valores devuelos a la tabla de simbolos
+                       for (Symbol symbol : tableSymbol) {
+                           if(symbol.getKey().equals(firstEnv)){ //buscamos la variable en la tabla de simbolos
+                               ArrayList<SubSymbol> tSubSymbol = (ArrayList<SubSymbol>) symbol.getValue().clone();
+                               for (SubSymbol subSymbol : tSubSymbol) {
+                                   if(subSymbol.getKey().equals(fterm)){
+                                       subSymbol.getValue().add(temp);
+                                   }
+                               }
+                           }
+                       }
+                   }
+               }
+            }
+            i++;
+        }
+        
+        System.out.println("-------------------------------------------------------");
+        
+        for (Symbol symbol : tableSymbol) {
+            System.out.println(symbol.toString());
+        }
+
+    }
+    
+    public ArrayList<String> getProductionFromBig(String env, String term){
+        ArrayList<String>temp = new ArrayList<>();
+        //buscamos en big struct la variable
+        for (Struct struct : this.getBigStruct()) {
+            if(struct.getKey().equals(env)){
+                //si cada produccion contiene la terminal retornar la producción
+                for (ArrayList<String> production : struct.getValue()) {
+                    if(production.contains(term)){
+                        temp = (ArrayList<String>) production.clone();
+                        //System.out.println(production + " contiene " + term);
+                        break;
+                    }else{
+                        temp = (ArrayList<String>) production.clone();
+                        //System.out.println(production + " no contiene " + term);
+                    }
+                }
+                
+            }
+        }
+        
+        return temp;
     }
 }

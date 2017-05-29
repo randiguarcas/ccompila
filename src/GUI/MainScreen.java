@@ -225,6 +225,9 @@ public class MainScreen extends javax.swing.JFrame {
         JTableFirstRender(robot.getFirstLogic());
         //metodo que retorna la funcion siguiente robot.getLastLogic()
         JTableLastRender(robot.getLastLogic());
+        //metodo que retorna la tabla de simbolos
+        robot.getSymbolTable();
+        
     }//GEN-LAST:event_JOpenFileActionPerformed
     
     /**
