@@ -882,7 +882,7 @@ public class Robot {
     ArrayList<Stack> globalStack = new ArrayList<Stack>();
     ArrayList<Symbol> validateSymbolTable = new ArrayList<>();
     
-    public String getStackLogic(String type, ArrayList<Symbol> symbolTable, ArrayList<Struct> bigStruct, ArrayList<Content> globalNotationWithP, ArrayList<String> terms) {
+    public String[] getStackLogic(String type, ArrayList<Symbol> symbolTable, ArrayList<Struct> bigStruct, ArrayList<Content> globalNotationWithP, ArrayList<String> terms) {
         String evaluate = type.trim().replace(" ","");
         evaluate = evaluate.substring(0,evaluate.length()-1);
         globalTermsForStack = terms;
@@ -908,63 +908,148 @@ public class Robot {
         
         
         //enviar tope de stack
-         //escogemos la ultima posición del arreglo
-        int bottom = globalStack.size();
-        //tomamos la ultima posición del arreglo
-        Stack bottomItem = globalStack.get((bottom-1));
-        recursiveStack(bottomItem);
-        
-        //pitnamos el list
-        for (Stack stack : globalStack) {
-            System.out.println(stack);
-        }
-        return null;
-    }
-    
-    public void recursiveStack(Stack bottomItem){
-        //tomamos el tope de la las variables
-        String topVars = bottomItem.getVars().get(0);
-        //tomamos el tope de la entrada
-        String topInput = bottomItem.getInput().get(0);
-        //System.out.println(topVars);
-        //System.out.println(topInput);
-        System.out.println("--------");
-        if(topVars.equals(topInput)){
-            System.out.println("igual");
-            bottomItem.getVars().remove(0);
-            bottomItem.getInput().remove(0);
-            //System.out.println(bottomItem);
-        }else{
-            
+        boolean flag = true;
+        int rerun = 0;
+        ArrayList<String> xc = new ArrayList<>();
+        String a = "";
+        while(flag){
+             //escogemos la ultima posición del arreglo
+            int bottom = globalStack.size();
+            //tomamos la ultima posición del arreglo
+            Stack bottomItem = globalStack.get((bottom-1));
+            //tomamos el tope de la las variables
+            String topVars = bottomItem.getVars().get(0);
+            //tomamos el tope de la entrada
+            String topInput = bottomItem.getInput().get(0);
+            //System.out.println("analizando "  + bottomItem);
+            a+=bottomItem.getVars()+","+bottomItem.getInput()+"," + bottomItem.getProduction() +"|";
+            //globalStack2.add(bottomItem);
             //buscamos el contenido en la tabla de simbolos
             ArrayList<String> cont = foundVarToTermSymbol(topVars, topInput);
             //agregamos el contenido anterior y lo agregamos al nuevo sin contar el tope de la fila
             for (int i = 1; i < bottomItem.getVars().size(); i++) {
                 cont.add(bottomItem.getVars().get(i));
             }
+            
+            if(topVars.equals(topInput)){
+                if(topVars=="$" && topInput =="$"){
+                    flag=false;
+                }else{
+                    
+                    Stack stack = new Stack();
+                    stack.setI(1);
+                    stack.setVars(this.cleanStack(cont));
+                    stack.setInput(getTo());
+                    ArrayList<String> get = new ArrayList<>();
+                    get.add(topVars + " → " + topInput);
+                    stack.setProduction(get);
+                    globalStack.add(stack);
+                    //flag=false;
+                }
+            }else{
+                if(cont.contains("e")){
+                    cont.remove(0);
+                    Stack stack = new Stack();
+                    stack.setI(1);
+                    stack.setVars(this.cleanStack(cont));
+                    stack.setInput(bottomItem.getInput());
+                    xc = bottomItem.getInput();
+                    ArrayList<String> get = new ArrayList<>();
+                    get.add(topVars + " → " + "e");
+                    stack.setProduction(get);
+                    globalStack.add(stack);
+                }else{
+                    Stack stack = new Stack();
+                    stack.setI(1);
+                    stack.setVars(this.cleanStack(cont));
+                    stack.setInput(bottomItem.getInput());
+                    xc = bottomItem.getInput();
+                    ArrayList<String> get = new ArrayList<>();
+                    globalStack.add(stack);
+                }
+                
+            }
+            
+        }
+        
+        //System.out.println(a);
+        //pitnamos el list
+        for (Stack stack : globalStack) {
+            //System.out.println(stack);
+            
+        }
+        for (Stack stack : globalStack2) {
+            //System.out.println(stack);
+        }
+        
+        String[] stackItems = a.split("\\|");
+        for (String stackItem : stackItems) {
+            System.out.println(stackItem);
+        }
+        return stackItems;
+    }
+    
+    public ArrayList<String> getTo(){
+        globalStack = (ArrayList<Stack>) globalStack.clone();
+        int bottom = globalStack.size();
+        //tomamos la ultima posición del arreglo
+        Stack bottomItem = globalStack.get((bottom-1));
+        bottomItem.getInput().remove(0);
+        return bottomItem.getInput();
+    }
+    
+    ArrayList<Stack> globalStack2 = new ArrayList<Stack>();
 
+    
+    public void recursiveStack(Stack bottomItem){
+        globalStack2.add(bottomItem);
+        System.out.println("analizando " +  bottomItem);
+        //tomamos el tope de la las variables
+        String topVars = bottomItem.getVars().get(0);
+        //tomamos el tope de la entrada
+        String topInput = bottomItem.getInput().get(0);
+	System.out.println("comparando " + topVars + ":" + topInput);		
+        if(topVars.equals(topInput)){
+            if(topVars!="&" && topInput!="$"){
+                System.out.println("--- iguales ---");
+              
+            }
+        }else{
+            //buscamos el contenido en la tabla de simbolos
+            ArrayList<String> cont = foundVarToTermSymbol(topVars, topInput);
+            //agregamos el contenido anterior y lo agregamos al nuevo sin contar el tope de la fila
+            for (int i = 1; i < bottomItem.getVars().size(); i++) {
+                cont.add(bottomItem.getVars().get(i));
+            }
+            
             Stack stack = new Stack();
             stack.setI(1);
             stack.setVars(this.cleanStack(cont));
             stack.setInput(bottomItem.getInput());
             ArrayList<String> get = new ArrayList<>();
-            //get.add(topVars + " → " + topInput);
-            //stack.setProduction(get);
-            globalStack.add(stack);
-            //enviamos la ultima fila
-            //enviar tope de stack
-            //escogemos la ultima posición del arreglo
-            int bottom = globalStack.size();
-            //tomamos la ultima posición del arreglo
-            Stack bottomItems = globalStack.get((bottom-1));
             
-            System.out.println(topVars);
-            System.out.println(topInput);
-            
-            recursiveStack(bottomItems);
+            if(!stack.getVars().get(0).equals(stack.getInput().get(0))){
+                System.out.println("Agregando " + stack);
+                System.out.println("--------------");
+                globalStack.add(stack);
+               
+                int bottom = globalStack.size();
+                //tomamos la ultima posición del arreglo
+                Stack bottomItems = globalStack.get((bottom-1));
+
+                recursiveStack(bottomItems);
+            }else{
+                //globalStack.add(stack);
+                int bottom = globalStack.size();
+                //tomamos la ultima posición del arreglo
+                Stack bottomItems = globalStack.get((bottom-1));
+                recursiveStack(bottomItems);
+            }
             
         }
-        
+    }
+    
+    public void add(){
         
     }
     

@@ -197,6 +197,7 @@ ArrayList<Content> globalNotationWithP;
         });
 
         JTAResult.setColumns(20);
+        JTAResult.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         JTAResult.setRows(5);
         JTAResult.setAutoscrolls(false);
         jScrollPane8.setViewportView(JTAResult);
@@ -345,7 +346,12 @@ ArrayList<Content> globalNotationWithP;
                 JLResultFromType.setText("Error - $ not defined");
             }else{
                 Robot robot = new Robot();
-                robot.getStackLogic(type, this.symbolTable, this.bigStruct, globalNotationWithP, this.terms);
+                String[] r = robot.getStackLogic(type, this.symbolTable, this.bigStruct, globalNotationWithP, this.terms);
+                String a = "";
+                for (String string : r) {
+                    a += string + "\n";
+                }
+                JTAResult.setText(a);
             }
             //
         }
