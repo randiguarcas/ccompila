@@ -20,7 +20,7 @@ public class Robot {
     private ArrayList<String> originalContent; //contenido original del archivo
     private ArrayList<Content> cleanContent = new ArrayList<Content>(); //array list de content
     private String[] alphabet; //array de alfabeto
-    private ArrayList<Content> globalNotationWP = new ArrayList<Content>();
+    public ArrayList<Content> globalNotationWP = new ArrayList<Content>();
     public ArrayList<String> terms = new ArrayList<>();
     
     public void load(ArrayList<String> content){
@@ -749,4 +749,267 @@ public class Robot {
         }
         return temp;
     }
+
+    
+     public void termType(String cadena, ArrayList<Content> globalNotationWithP){
+       ArrayList<String> tempVars = new ArrayList<>();
+        //System.out.println("analizar; "+production);
+        //convierte cada produccion en un arrar de caracteres
+        char[] items = cadena.toCharArray();
+        //variables de uso
+        String memory="";
+        int found = 0;
+        int strike = 0;
+        String P = "";
+        //por cada caracter analizar si es terminal o variable
+        for (int i = items.length - 1; i >= 0; i--) {
+            char item = items[i];
+            //Si el item empieza con ' probablemente sea una terminal
+            if(item=='\''){
+                //si encuentra el ' de inicio
+                if(found == 1){
+                    //Obtiene la terminal
+                    String real = this.reverseEnviromentToTerm(memory);
+                    tempVars.add(real);
+                    //reinicio de variables
+                    memory="";
+                    found=0;
+                    strike=0;    
+                }
+                //sigue el contador buscando el  ' de cierre
+                found++;
+            }else{
+                System.out.println(item + "No empieza con ' ");
+                if(found==1){
+                    //concatena todo lo que tenga hasta que encuentre el de cierre y reinicie variables
+                    strike++;
+                    memory += String.valueOf(item);
+                    System.out.println(memory);
+               }else{
+                    
+                    P += String.valueOf(item);
+                    // Recorremos el array global de variables:producciones
+                    for (int j = 0; j < globalNotationWithP.size(); j++) {
+                        Content global = globalNotationWithP.get(j);
+                        // Verificamos si el elemento que viene es una variable
+                        String real = this.reverseEnviromentToTerm(P);
+                        if(global.getKey().equals(real)){
+                            //Agregamos la variable al array de elementos
+                            tempVars.add(real);
+                            P = "";
+                            break;
+                        }
+                        else{
+                            
+                        }
+                    }
+                }
+            }
+            
+        }
+       
+        //reverse de array que contiene elementos
+        Collections.reverse(tempVars);
+         System.out.println(tempVars);
+        //return tempVars;
+    }
+     
+    ArrayList<String> globalTermsForStack; 
+    String globalEvaluate;
+    ArrayList<String> termsFromTerms = new ArrayList<>();
+    public void recursiveTerms(String evaluate){
+        
+        //String rEvaluate;
+        String memory = "";
+        ArrayList<Integer> removeIndex = new ArrayList<Integer>();
+        
+        if(evaluate!=""){
+            char[] stackEvaluate = evaluate.toCharArray();
+            for (int i = stackEvaluate.length - 1; i >= 0; i--) {
+                memory += String.valueOf(stackEvaluate[i]);
+                String term = isTerminalFromStack(memory);
+                
+                if(term!=""){
+                    //System.out.println("apilar " +term );
+                    termsFromTerms.add(term);
+                    removeIndex.add(i);
+                    String newEvaluate = removeInEvaluate(removeIndex, evaluate);
+                    recursiveTerms(newEvaluate);
+                    break;
+                }else{
+                    removeIndex.add(i);
+                    //System.out.println("No encontrado " + memory);
+                }
+            }
+        }
+    }
+    
+    public String removeInEvaluate(ArrayList<Integer> index, String cad){
+        //System.out.println(index);
+        String temp = "";
+        char[] ncad = cad.toCharArray();
+        for (int i = 0; i < ncad.length; i++) {
+            //recorremos el array de indexs a remover
+            if(!index.contains(i)){
+                temp += ncad[i];
+            }
+        }
+        //System.out.println(temp);
+        return temp;
+    }
+    public String isTerminalFromStack(String value){
+         //ordena los caracteres
+        char[] nt = value.toCharArray();
+        String memo = "";
+        String temp = "";
+        
+        for (int i = nt.length - 1; i >= 0; i--) {
+            memo += String.valueOf(nt[i]);
+        }
+        
+        //System.out.println("buscar " + memo);
+        
+        for (String sTerm : globalTermsForStack) {
+            if(sTerm.equals(memo)){
+                //System.out.println("encontrado " + sTerm);
+                temp = sTerm;
+                break;
+            }
+        }
+        return temp;
+    }
+    
+    ArrayList<Stack> globalStack = new ArrayList<Stack>();
+    ArrayList<Symbol> validateSymbolTable = new ArrayList<>();
+    
+    public String getStackLogic(String type, ArrayList<Symbol> symbolTable, ArrayList<Struct> bigStruct, ArrayList<Content> globalNotationWithP, ArrayList<String> terms) {
+        String evaluate = type.trim().replace(" ","");
+        evaluate = evaluate.substring(0,evaluate.length()-1);
+        globalTermsForStack = terms;
+        this.recursiveTerms(evaluate);
+        Collections.reverse(termsFromTerms);
+        termsFromTerms.add("$");
+        
+        Stack initialStack = new Stack();
+        initialStack.setI(1);
+        //agregamos la entrada
+        initialStack.setInput(termsFromTerms);
+        //agregamos la variable inicial
+        String initialVar = bigStruct.get(0).key;
+        ArrayList<String> in = new ArrayList<>();
+        in.add(initialVar);
+        in.add("$");
+        initialStack.setVars(in);
+        
+        //agregamos la clase al array de clases
+        globalStack.add(initialStack);
+        //cargamos la tabla de simbolos
+        validateSymbolTable = symbolTable;
+        
+        
+        //enviar tope de stack
+         //escogemos la ultima posición del arreglo
+        int bottom = globalStack.size();
+        //tomamos la ultima posición del arreglo
+        Stack bottomItem = globalStack.get((bottom-1));
+        recursiveStack(bottomItem);
+        
+        //pitnamos el list
+        for (Stack stack : globalStack) {
+            System.out.println(stack);
+        }
+        return null;
+    }
+    
+    public void recursiveStack(Stack bottomItem){
+        //tomamos el tope de la las variables
+        String topVars = bottomItem.getVars().get(0);
+        //tomamos el tope de la entrada
+        String topInput = bottomItem.getInput().get(0);
+        //System.out.println(topVars);
+        //System.out.println(topInput);
+        System.out.println("--------");
+        if(topVars.equals(topInput)){
+            System.out.println("igual");
+            bottomItem.getVars().remove(0);
+            bottomItem.getInput().remove(0);
+            //System.out.println(bottomItem);
+        }else{
+            
+            //buscamos el contenido en la tabla de simbolos
+            ArrayList<String> cont = foundVarToTermSymbol(topVars, topInput);
+            //agregamos el contenido anterior y lo agregamos al nuevo sin contar el tope de la fila
+            for (int i = 1; i < bottomItem.getVars().size(); i++) {
+                cont.add(bottomItem.getVars().get(i));
+            }
+
+            Stack stack = new Stack();
+            stack.setI(1);
+            stack.setVars(this.cleanStack(cont));
+            stack.setInput(bottomItem.getInput());
+            ArrayList<String> get = new ArrayList<>();
+            //get.add(topVars + " → " + topInput);
+            //stack.setProduction(get);
+            globalStack.add(stack);
+            //enviamos la ultima fila
+            //enviar tope de stack
+            //escogemos la ultima posición del arreglo
+            int bottom = globalStack.size();
+            //tomamos la ultima posición del arreglo
+            Stack bottomItems = globalStack.get((bottom-1));
+            
+            System.out.println(topVars);
+            System.out.println(topInput);
+            
+            recursiveStack(bottomItems);
+            
+        }
+        
+        
+    }
+    
+    //busca la variable y el terminal en la tabla de simbolos
+    public ArrayList<String> foundVarToTermSymbol(String var, String term){
+        ArrayList<String> temp = new ArrayList<>();
+        for (Symbol symbol : validateSymbolTable) {
+            if(symbol.getKey().equals(var)){
+                //System.out.println(symbol);
+                for (SubSymbol subSymbol : symbol.getValue()) {
+                    if(subSymbol.getKey().equals(term)){
+                        temp = subSymbol.getValue().get(0); //solo la posición del primer vector de valores
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        return temp;
+    }
+    
+    public Integer validateTopStack(Stack item){
+        int temp = 0;
+        //tomamos el tope de la las variables
+        String topVars = item.getVars().get(0);
+        //tomamos el tope de la entrada
+        String topInput = item.getInput().get(0);
+        
+        if(topVars.equals(topInput)){
+            //System.out.println("son iguales");
+            if(topVars == "$" && topInput == "$"){
+                System.out.println("son iguales $");
+                temp = 2;
+            }else{
+                temp = 1;
+            }
+        }
+        
+        //System.out.println("tope de variables " + topVars);
+        //System.out.println("tope de entrada" + topInput);
+        
+        return temp;
+    }
+
+  
+    
+    
 }
