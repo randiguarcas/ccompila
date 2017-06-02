@@ -10,6 +10,7 @@ import classes.First;
 import classes.Last;
 import classes.ReaderFile;
 import classes.Robot;
+import classes.Stack;
 import classes.Struct;
 import classes.Symbol;
 import java.awt.Color;
@@ -83,9 +84,9 @@ ArrayList<Content> globalNotationWithP;
         jLabel2 = new javax.swing.JLabel();
         JTString = new javax.swing.JTextField();
         JBValidate = new javax.swing.JButton();
-        jScrollPane8 = new javax.swing.JScrollPane();
-        JTAResult = new javax.swing.JTextArea();
         JLResultFromType = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        JTableStack = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -196,13 +197,18 @@ ArrayList<Content> globalNotationWithP;
             }
         });
 
-        JTAResult.setColumns(20);
-        JTAResult.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        JTAResult.setRows(5);
-        JTAResult.setAutoscrolls(false);
-        jScrollPane8.setViewportView(JTAResult);
-
         JLResultFromType.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+
+        JTableStack.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
+        JTableStack.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3"
+            }
+        ));
+        jScrollPane8.setViewportView(JTableStack);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -223,8 +229,8 @@ ArrayList<Content> globalNotationWithP;
                                 .addComponent(JTString, javax.swing.GroupLayout.PREFERRED_SIZE, 560, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(JBValidate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 551, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane8))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -275,8 +281,8 @@ ArrayList<Content> globalNotationWithP;
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(JBValidate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(JTString, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)))
-                    .addComponent(jScrollPane8))
-                .addContainerGap(27, Short.MAX_VALUE))
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap(57, Short.MAX_VALUE))
         );
 
         pack();
@@ -346,12 +352,21 @@ ArrayList<Content> globalNotationWithP;
                 JLResultFromType.setText("Error - $ not defined");
             }else{
                 Robot robot = new Robot();
-                String[] r = robot.getStackLogic(type, this.symbolTable, this.bigStruct, globalNotationWithP, this.terms);
-                String a = "";
+                ArrayList<Stack> r = robot.getStackLogic(type, this.symbolTable, this.bigStruct, globalNotationWithP, this.terms);
+                
+                ArrayList<Stack> need = new ArrayList<>();
+                for (Stack stack : r) {
+                    if(stack==null){}
+                    else{
+                        need.add(stack);
+                    }
+                }
+                JTableStackRender(need);
+                /*String a = "";
                 for (String string : r) {
                     a += string + "\n";
                 }
-                JTAResult.setText(a);
+                JTAResult.setText(a);*/
             }
             //
         }
@@ -398,13 +413,13 @@ ArrayList<Content> globalNotationWithP;
     private javax.swing.JLabel JFile;
     private javax.swing.JLabel JLResultFromType;
     private javax.swing.JButton JOpenFile;
-    private javax.swing.JTextArea JTAResult;
     private javax.swing.JTextField JTString;
     private javax.swing.JTable JTableAlphabet;
     private javax.swing.JTable JTableContent;
     private javax.swing.JTable JTableEnviroments;
     private javax.swing.JTable JTableFirst;
     private javax.swing.JTable JTableLast;
+    private javax.swing.JTable JTableStack;
     private javax.swing.JTable JTableSymbol;
     private javax.swing.JTable JTableTerms;
     private javax.swing.JLabel jLabel1;
@@ -543,6 +558,32 @@ ArrayList<Content> globalNotationWithP;
         }
          
         JTableSymbol.setModel(FileTableModel);
+    }
+
+    private void JTableStackRender(ArrayList<Stack> need) {
+        
+        DefaultTableModel FileTableModel = new DefaultTableModel();
+        FileTableModel.setColumnIdentifiers(new String[]{"Pila","Entrada","Producción"});
+        Object[] FileRow = new Object[FileTableModel.getColumnCount()];
+        
+        for (Stack stack : need) {
+            if(stack.getVars().size() > 0 && stack.getInput().size() > 0){
+                FileRow[0] = stack.getVars().toString();
+                FileRow[1] = stack.getInput().toString();
+                //FileRow[2] = stack.getProduction().toString();
+                FileTableModel.addRow(FileRow);
+            }
+            
+        }
+        /*for (Last getFirst : first) {
+            FileRow[0] = getFirst.toString();
+            FileTableModel.addRow(FileRow);
+        }*/
+        
+        JTableStack.setModel(FileTableModel);
+        JLResultFromType.setText("String is Ok");
+        JLResultFromType.setForeground(Color.GREEN);
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
    

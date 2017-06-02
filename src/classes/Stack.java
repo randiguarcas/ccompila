@@ -51,7 +51,7 @@ public class Stack {
 
     @Override
     public String toString() {
-        return i + " " + vars + " " + input + " " + production;
+        return vars + " " + input + " " + production;
     }
     
  

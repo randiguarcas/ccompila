@@ -8,6 +8,7 @@ package classes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 /**alpabethPrefix
@@ -549,6 +550,7 @@ public class Robot {
                     stack.add(value);
             }            
         }
+        //System.out.println(stack);
         return stack;
     }
     
@@ -882,7 +884,7 @@ public class Robot {
     ArrayList<Stack> globalStack = new ArrayList<Stack>();
     ArrayList<Symbol> validateSymbolTable = new ArrayList<>();
     
-    public String[] getStackLogic(String type, ArrayList<Symbol> symbolTable, ArrayList<Struct> bigStruct, ArrayList<Content> globalNotationWithP, ArrayList<String> terms) {
+    public ArrayList<Stack> getStackLogic(String type, ArrayList<Symbol> symbolTable, ArrayList<Struct> bigStruct, ArrayList<Content> globalNotationWithP, ArrayList<String> terms) {
         String evaluate = type.trim().replace(" ","");
         evaluate = evaluate.substring(0,evaluate.length()-1);
         globalTermsForStack = terms;
@@ -906,89 +908,100 @@ public class Robot {
         //cargamos la tabla de simbolos
         validateSymbolTable = symbolTable;
         
+        //fin nuevo código
+        boolean exitIterator = false;
         
-        //enviar tope de stack
-        boolean flag = true;
-        int rerun = 0;
-        ArrayList<String> xc = new ArrayList<>();
-        String a = "";
-        while(flag){
-             //escogemos la ultima posición del arreglo
-            int bottom = globalStack.size();
+        int prueba = 0;
+        
+        while(!exitIterator){
+            //escogemos la ultima posición del arreglo
+            int size = globalStack.size();
             //tomamos la ultima posición del arreglo
-            Stack bottomItem = globalStack.get((bottom-1));
+            Stack lastItem = globalStack.get((size-1));
             //tomamos el tope de la las variables
-            String topVars = bottomItem.getVars().get(0);
-            //tomamos el tope de la entrada
-            String topInput = bottomItem.getInput().get(0);
-            //System.out.println("analizando "  + bottomItem);
-            a+=bottomItem.getVars()+","+bottomItem.getInput()+"," + bottomItem.getProduction() +"|";
-            //globalStack2.add(bottomItem);
-            //buscamos el contenido en la tabla de simbolos
-            ArrayList<String> cont = foundVarToTermSymbol(topVars, topInput);
-            //agregamos el contenido anterior y lo agregamos al nuevo sin contar el tope de la fila
-            for (int i = 1; i < bottomItem.getVars().size(); i++) {
-                cont.add(bottomItem.getVars().get(i));
-            }
+            String topVars = lastItem.getVars().get(0);
+            String topInput = lastItem.getInput().get(0);
+           
+            //System.out.println("analizando " + lastItem);
+            //Stack stack = new Stack();
+            ArrayList<String> newVars = foundVarToTermSymbol(topVars, topInput);
+            ArrayList<String> inVars = (ArrayList<String>) lastItem.getVars().clone();
+            ArrayList<String> inInput = (ArrayList<String>) lastItem.getInput().clone();
             
             if(topVars.equals(topInput)){
-                if(topVars=="$" && topInput =="$"){
-                    flag=false;
-                }else{
-                    
-                    Stack stack = new Stack();
-                    stack.setI(1);
-                    stack.setVars(this.cleanStack(cont));
-                    stack.setInput(getTo());
-                    ArrayList<String> get = new ArrayList<>();
-                    get.add(topVars + " → " + topInput);
-                    stack.setProduction(get);
-                    globalStack.add(stack);
-                    //flag=false;
-                }
-            }else{
-                if(cont.contains("e")){
-                    cont.remove(0);
-                    Stack stack = new Stack();
-                    stack.setI(1);
-                    stack.setVars(this.cleanStack(cont));
-                    stack.setInput(bottomItem.getInput());
-                    xc = bottomItem.getInput();
-                    ArrayList<String> get = new ArrayList<>();
-                    get.add(topVars + " → " + "e");
-                    stack.setProduction(get);
-                    globalStack.add(stack);
-                }else{
-                    Stack stack = new Stack();
-                    stack.setI(1);
-                    stack.setVars(this.cleanStack(cont));
-                    stack.setInput(bottomItem.getInput());
-                    xc = bottomItem.getInput();
-                    ArrayList<String> get = new ArrayList<>();
-                    globalStack.add(stack);
+                
+                //System.out.println("iguales " + inVars + "  " + inInput);
+                
+                ArrayList<String> xn = new ArrayList<>();
+                ArrayList<String> yn  = new ArrayList<>();
+                
+                for (String inVar : inVars) {
+                    if(!inVar.equals(topVars)){
+                        xn.add(inVar);
+                    }
                 }
                 
+                for (int i = 1; i < inInput.size(); i++) {
+                    yn.add(inInput.get(i));
+                }
+                
+                Stack stack = new Stack();
+                stack.setVars(removeDuplicates(xn));
+                stack.setInput(yn);
+                globalStack.add(stack);
+                if( (topVars.equals("$") && topInput.equals("$")) ||  (topVars.isEmpty() && topInput.isEmpty()) ){
+                    exitIterator = true;
+                }
+                //exitIterator = true;
+                
+            }else{
+                for (String inVar : inVars) {
+                    if(!inVar.equals(topVars)){
+                        newVars.add(inVar);
+                    }
+                }
+                if(newVars.get(0).equals("e")){
+                    newVars.remove(0);
+                }
+                System.out.println(newVars);
+                
+                Stack stack = new Stack();
+                stack.setVars(removeDuplicates(newVars));
+                stack.setInput(inInput);
+                globalStack.add(stack);
+                //exitIterator = true;
             }
             
         }
         
-        //System.out.println(a);
-        //pitnamos el list
-        for (Stack stack : globalStack) {
-            //System.out.println(stack);
-            
-        }
-        for (Stack stack : globalStack2) {
-            //System.out.println(stack);
-        }
         
-        String[] stackItems = a.split("\\|");
+        System.out.println("---- begin ----");
+        for (int i = 0; i < globalStack.size(); i++) {
+            Stack get = globalStack.get(i);
+            System.out.println(i + " " + get);
+        }
+        System.out.println("---- fin ----");
+       
+        
+        /*String[] stackItems = a.split("\\|");
         for (String stackItem : stackItems) {
             System.out.println(stackItem);
-        }
-        return stackItems;
+        }*/
+        String[] stackItems = null;
+        //return stackItems;
+        return globalStack;
     }
-    
+    public ArrayList<String> removeDuplicates(ArrayList<String> stack){
+        ArrayList<String> lista = new ArrayList<String>();
+        
+        for (int i = 0; i < stack.size(); i++) {
+            String value = stack.get(i);
+            if(!lista.contains(value) ){
+                    lista.add(value);
+            }            
+        }
+        return lista;
+    }
     public ArrayList<String> getTo(){
         globalStack = (ArrayList<Stack>) globalStack.clone();
         int bottom = globalStack.size();
