@@ -208,6 +208,7 @@ ArrayList<Content> globalNotationWithP;
                 "Title 1", "Title 2", "Title 3"
             }
         ));
+        JTableStack.setRowHeight(20);
         jScrollPane8.setViewportView(JTableStack);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -345,23 +346,36 @@ ArrayList<Content> globalNotationWithP;
         String type = JTString.getText();
         if(type.isEmpty()){
             JLResultFromType.setForeground(Color.red);
-            JLResultFromType.setText("Error - Is Empty");
+            JLResultFromType.setText("#Error - Is Empty");
         }else{
             if(!type.contains("$")){
                 JLResultFromType.setForeground(Color.red);
-                JLResultFromType.setText("Error - $ not defined");
+                JLResultFromType.setText("#Error $ not defined");
             }else{
                 Robot robot = new Robot();
-                ArrayList<Stack> r = robot.getStackLogic(type, this.symbolTable, this.bigStruct, globalNotationWithP, this.terms);
                 
-                ArrayList<Stack> need = new ArrayList<>();
-                for (Stack stack : r) {
-                    if(stack==null){}
-                    else{
-                        need.add(stack);
+                try{
+                    ArrayList<Stack> r = robot.getStackLogic(type, this.symbolTable, this.bigStruct, globalNotationWithP, this.terms);
+                    
+                    ArrayList<Stack> need = new ArrayList<>();
+                    for (Stack stack : r) {
+                        if(stack==null){}
+                        else{
+                            need.add(stack);
+                        }
                     }
+                    JTableStackRender(need);
+
+                }catch(Exception e){
+                    //if(r.size()==0 || r==null){
+                    JLResultFromType.setText("#Error String Invalid");
+                    JLResultFromType.setForeground(Color.red);
+                    //}
                 }
-                JTableStackRender(need);
+                
+                
+                
+                
                 /*String a = "";
                 for (String string : r) {
                     a += string + "\n";
@@ -582,7 +596,7 @@ ArrayList<Content> globalNotationWithP;
         
         JTableStack.setModel(FileTableModel);
         JLResultFromType.setText("String is Ok");
-        JLResultFromType.setForeground(Color.GREEN);
+        JLResultFromType.setForeground(new Color(34,139,34));
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
