@@ -668,8 +668,9 @@ public class Robot {
             
             for (SubSymbol subSymbol : symbol.getValue()) {
                 String r = "";
+                
                 for (ArrayList<String> itemSub : subSymbol.getValue()) {
-                    r += itemSub.toString().replace(",", "");
+                    r += itemSub.toString().replace(",", "").replace("[", "").replace("]", "");
                 }
                 row[i] = r;//subSymbol.getValue().toString();
                 i++;
@@ -883,6 +884,18 @@ public class Robot {
     
     ArrayList<Stack> globalStack = new ArrayList<Stack>();
     ArrayList<Symbol> validateSymbolTable = new ArrayList<>();
+    ArrayList<String> termsF = new ArrayList<>();
+    /*public ArrayList<String> showTerms(String type, ArrayList<Symbol> symbolTable, ArrayList<Struct> bigStruct, ArrayList<Content> globalNotationWithP, ArrayList<String> terms) {
+        String evaluate = type.trim().replace(" ","");
+        evaluate = evaluate.substring(0,evaluate.length()-1);
+        globalTermsForStack = terms;
+        this.recursiveTerms(evaluate);
+        
+        Collections.reverse(termsFromTerms);
+        System.out.println(termsFromTerms);
+        
+        return termsFromTerms;
+    }*/
     
     public ArrayList<Stack> getStackLogic(String type, ArrayList<Symbol> symbolTable, ArrayList<Struct> bigStruct, ArrayList<Content> globalNotationWithP, ArrayList<String> terms) {
         String evaluate = type.trim().replace(" ","");
